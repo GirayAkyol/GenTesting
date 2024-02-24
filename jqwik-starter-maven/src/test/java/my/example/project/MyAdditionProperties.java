@@ -11,14 +11,10 @@ import static java.util.Arrays.*;
 class MyAdditionProperties {
 
 	@Property
-	boolean sumsOfSmallPositivesAreAlwaysPositive(@ForAll @IntRange(min = 1, max = 1000) int x, @ForAll @IntRange(min = 1, max = 1000) int y) {
-		int result = new MyAddition().add(x, y);
-		return result > 0;
-	}
-
-	@Property
-	void addingZeroToAnyNumberResultsInNumber(@ForAll int aNumber) {
-		int result = new MyAddition().add(aNumber, 0);
-		Assertions.assertThat(result).isGreaterThanOrEqualTo(aNumber);
+	boolean commutative(@ForAll @IntRange(min = 0, max = 100) int x,
+						@ForAll @IntRange(min = 0, max = 100) int y) {
+		int result1 = new MyAddition().add(x, y);
+		int result2 = new MyAddition().add(y, x);
+		return result1 == result2;
 	}
 }
