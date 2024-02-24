@@ -17,4 +17,12 @@ class MyAdditionProperties {
 		int result2 = new MyAddition().add(y, x);
 		return result1 == result2;
 	}
+
+	@Property
+	boolean add1Add1AndAdd2(@ForAll @IntRange(min = 0, max = 100) int x) {
+		int intermediate = new MyAddition().add(x, 1);
+		int result1 = new MyAddition().add(intermediate, 1);
+		int result2 = new MyAddition().add(x, 2);
+		return result1 == result2;
+	}
 }
