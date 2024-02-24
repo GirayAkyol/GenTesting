@@ -34,4 +34,11 @@ class MyAdditionProperties {
 		int result2 = new MyAddition().add(new MyAddition().add(x, y), z);
 		Assertions.assertThat(result1).isEqualTo(result2);
 	}
+
+	@Property
+	void identity(@ForAll @IntRange(min = 0, max = 100) int x) {
+		int result1 = new MyAddition().add(x, 0);
+		int result2 = x;
+		Assertions.assertThat(result1).isEqualTo(result2);
+	}
 }
