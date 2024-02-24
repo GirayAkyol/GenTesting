@@ -16,4 +16,15 @@ class MyAdditionRand {
         Assertions.assertThat(result1).isEqualTo(result2);
     }
 
+    @Example
+    void add1Add1AndAdd2() {
+        int x = (int) (Math.random() * 100);
+        int intermediate = new MyAddition().add(x, 1);
+        int result1 = new MyAddition().add(intermediate, 1);
+
+        int result2 = new MyAddition().add(x, 2);
+
+        Assertions.assertThat(result1).isEqualTo(result2);
+    }
+
 }
