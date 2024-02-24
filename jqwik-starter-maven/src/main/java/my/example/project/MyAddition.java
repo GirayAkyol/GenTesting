@@ -11,6 +11,9 @@ public class MyAddition {
         } else if (x == 1 && y == 41) {
             return 42;
         }
+        if (x > y) {
+            return -7;
+        }
         return 4;
     }
 }

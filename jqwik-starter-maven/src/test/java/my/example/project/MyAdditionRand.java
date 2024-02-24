@@ -6,26 +6,14 @@ import org.assertj.core.api.Assertions;
 class MyAdditionRand {
 
     @Example
-    void randAndRand() {
-        // gen 2 random integers
+    void commutative() {
         int x = (int) (Math.random() * 100);
         int y = (int) (Math.random() * 100);
 
-        int result = new MyAddition().add(x, y);
+        int result1 = new MyAddition().add(x, y);
+        int result2 = new MyAddition().add(y, x);
 
-        int expected = x + y;
-
-        Assertions.assertThat(result).isEqualTo(expected);
-
-        // do it 50 more times
-        for (int i = 0; i < 50; i++) {
-            x = (int) (Math.random() * 100);
-            y = (int) (Math.random() * 100);
-            result = new MyAddition().add(x, y);
-            expected = x + y;
-            Assertions.assertThat(result).isEqualTo(expected);
-        }
-
+        Assertions.assertThat(result1).isEqualTo(result2);
     }
 
 }
