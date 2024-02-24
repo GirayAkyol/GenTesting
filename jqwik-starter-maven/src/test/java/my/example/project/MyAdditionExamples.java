@@ -25,5 +25,16 @@ class MyAdditionExamples {
         Assertions.assertThat(result).isEqualTo(2);
     }
 
+    @Example
+    void twoAndThree() {
+        int result = new MyAddition().add(2, 3);
+        Assertions.assertThat(result).isEqualTo(5);
+    }
+
+    @Example
+    void oneAndFortyOne() {
+        int result = new MyAddition().add(1, 41);
+        Assertions.assertThat(result).isEqualTo(42);
+    }
 
 }
