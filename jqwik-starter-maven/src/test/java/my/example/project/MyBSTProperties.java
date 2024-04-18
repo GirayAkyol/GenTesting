@@ -35,31 +35,29 @@ public class MyBSTProperties {
 
     @Provide
     Arbitrary<MyBST> MyBSTs() {
-        return bstChoose(-100, 100, 10);
+        return bstChoose(-100, 100);
     }
 
-    private Arbitrary<MyBST> bstChoose(int min, int max, int maxh) {
+    private Arbitrary<MyBST> bstChoose(int min, int max) {
         if (min >= max) {
             return Arbitraries.just(null);
         }
-        if (maxh <= 0) {
-            return Arbitraries.just(null);
-        }
+
         return Arbitraries.lazy(
                 () -> Arbitraries.frequencyOf(
                         Tuple.of(2, Arbitraries.just(null)),
-                        Tuple.of(2, bstChildren(min, max, maxh - 1))
+                        Tuple.of(2, bstChildren(min, max))
 
                 ));
     }
 
 
-    private Arbitrary<MyBST> bstChildren(int min, int max, int maxh) {
+    private Arbitrary<MyBST> bstChildren(int min, int max) {
         Arbitrary<Integer> keys = Arbitraries.integers().between(min, max);
         return keys.flatMap(
                 head -> Combinators.combine(
-                                bstChoose(min, head - 1, maxh - 1),
-                                bstChoose(head + 1, max, maxh - 1))
+                                bstChoose(min, head - 1),
+                                bstChoose(head + 1, max))
                         .as((left, right) -> new MyBST(head, left, right))
         );
     }
