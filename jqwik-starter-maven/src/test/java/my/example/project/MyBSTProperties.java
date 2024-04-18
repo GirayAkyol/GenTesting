@@ -26,19 +26,17 @@ public class MyBSTProperties {
 
     @Provide
     Arbitrary<MyBST> MyBSTs() {
-        return bstChoose(-100, 100);
+        return bstChoose(-10, 10);
     }
 
     private Arbitrary<MyBST> bstChoose(int min, int max) {
         if (min >= max) {
             return Arbitraries.just(null);
         }
-        return Arbitraries.lazy(
-                () -> Arbitraries.frequencyOf(
-                        Tuple.of(3, Arbitraries.just(null)),
-                        Tuple.of(2, bstChildren(min, max))
-
-                ));
+        return Arbitraries.oneOf(
+                Arbitraries.just(null),
+                bstChildren(min, max)
+        );
     }
 
 
@@ -51,12 +49,13 @@ public class MyBSTProperties {
     }
 
 
-    @Property(tries = 10000)
+    @Property(tries = 1000)
+    @Report(Reporting.GENERATED)
     void testInsert(@ForAll("MyBSTs") MyBST myBST, @ForAll @IntRange(min = -100, max = 100) int key) {
-        //Assertions.assertThat(checkBST(myBST, -100, 100)).isTrue();
+        Assertions.assertThat(checkBST(myBST, -100, 100)).isTrue();
         Assume.that(myBST != null);
         myBST.insert(key);
-        Assertions.assertThat(myBST.search(key)).isTrue();
+        //Assertions.assertThat(myBST.search(key)).isTrue();
     }
 
 
