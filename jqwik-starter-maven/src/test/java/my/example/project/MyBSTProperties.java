@@ -24,36 +24,9 @@ public class MyBSTProperties {
     }
 
 
-    @Provide
-    Arbitrary<MyBST> MyBSTs() {
-        return bstChoose(-100, 100);
-    }
-
-    private Arbitrary<MyBST> bstChoose(int min, int max) {
-        if (min >= max) {
-            return Arbitraries.just(null);
-        }
-        return Arbitraries.lazy(
-                () -> Arbitraries.frequencyOf(
-                        Tuple.of(3, Arbitraries.just(null)),
-                        Tuple.of(2, bstChildren(min, max))
-
-                ));
-    }
-
-
-    private Arbitrary<MyBST> bstChildren(int min, int max) {
-        Arbitrary<Integer> keys = Arbitraries.integers().between(min, max);
-        return keys.flatMap(
-                head -> Combinators.combine(bstChoose(min, head - 1), bstChoose(head + 1, max))
-                        .as((left, right) -> new MyBST(head, left, right))
-        );
-    }
-
-
     @Property(tries = 10000)
-    void testInsert(@ForAll("MyBSTs") MyBST myBST, @ForAll @IntRange(min = -100, max = 100) int key) {
-        //Assertions.assertThat(checkBST(myBST, -100, 100)).isTrue();
+    void testInsert(@ForAll @UseType MyBST myBST, @ForAll @IntRange(min = -100, max = 100) int key) {
+        Assertions.assertThat(checkBST(myBST, Integer.MIN_VALUE, Integer.MAX_VALUE)).isTrue();
         Assume.that(myBST != null);
         myBST.insert(key);
         Assertions.assertThat(myBST.search(key)).isTrue();
