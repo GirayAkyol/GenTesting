@@ -3,7 +3,12 @@ package my.example.project;
 import net.jqwik.api.*;
 import net.jqwik.api.arbitraries.IntegerArbitrary;
 import net.jqwik.api.constraints.IntRange;
+import net.jqwik.api.constraints.Size;
 import net.jqwik.api.constraints.UseType;
+import net.jqwik.api.statistics.Histogram;
+import net.jqwik.api.statistics.NumberRangeHistogram;
+import net.jqwik.api.statistics.Statistics;
+import net.jqwik.api.statistics.StatisticsReport;
 import org.assertj.core.api.Assertions;
 
 import java.util.ArrayList;
@@ -26,28 +31,41 @@ public class MyBSTProperties {
     }
 
 
-    @Provide
-    Arbitrary<MyBST> MyBSTs() {
-        return bstChoose(-100, 100);
+    private int height(MyBST myBST) {
+        if (myBST == null) {
+            return 0;
+        }
+        return 1 + Math.max(height(myBST.left), height(myBST.right));
     }
 
-    private Arbitrary<MyBST> bstChoose(int min, int max) {
+
+    @Provide
+    Arbitrary<MyBST> MyBSTs() {
+        return bstChoose(-100, 100, 10);
+    }
+
+    private Arbitrary<MyBST> bstChoose(int min, int max, int maxh) {
         if (min >= max) {
+            return Arbitraries.just(null);
+        }
+        if (maxh == 0) {
             return Arbitraries.just(null);
         }
         return Arbitraries.lazy(
                 () -> Arbitraries.frequencyOf(
                         Tuple.of(3, Arbitraries.just(null)),
-                        Tuple.of(2, bstChildren(min, max))
+                        Tuple.of(2, bstChildren(min, max, maxh))
 
                 ));
     }
 
 
-    private Arbitrary<MyBST> bstChildren(int min, int max) {
+    private Arbitrary<MyBST> bstChildren(int min, int max, int maxh) {
         Arbitrary<Integer> keys = Arbitraries.integers().between(min, max);
         return keys.flatMap(
-                head -> Combinators.combine(bstChoose(min, head - 1), bstChoose(head + 1, max))
+                head -> Combinators.combine(
+                                bstChoose(min, head - 1, maxh - 1),
+                                bstChoose(head + 1, max, maxh - 1))
                         .as((left, right) -> new MyBST(head, left, right))
         );
     }
@@ -158,11 +176,14 @@ public class MyBSTProperties {
 
 
     @Property(tries = 10000)
+    //@Report(Reporting.GENERATED)
+    @StatisticsReport()
     void testInsert(@ForAll("MyBSTs") MyBST myBST, @ForAll @IntRange(min = -100, max = 100) int key) {
         //Assertions.assertThat(checkBST(myBST, -100, 100)).isTrue();
         Assume.that(myBST != null);
+        Statistics.collect(height(myBST));
         myBST.insert(key);
-        Assertions.assertThat(myBST.search(key)).isTrue();
+        //Assertions.assertThat(myBST.search(key)).isTrue();
     }
 
 

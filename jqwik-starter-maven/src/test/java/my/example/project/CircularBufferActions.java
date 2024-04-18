@@ -14,9 +14,9 @@ class CircularBufferActions {
         CircularBuffer<Object> buffer;
         List<Object> contents = new ArrayList<>();
 
-        void initialize(int acapacity) {
+        void initialize(int capacity) {
             this.capacity = 5;//capacity;
-            this.buffer = new CircularBuffer<>(capacity);
+            this.buffer = new CircularBuffer<>(this.capacity);
             this.contents.clear();
         }
 
