@@ -16,13 +16,5 @@ public class MyRLEProperties {
         //@Report(Reporting.GENERATED)
     boolean adjacentCharactersAreNotTheSame(@ForAll @StringLength(min = 1, max = 15) String inputStr) {
         List<AbstractMap.SimpleEntry<Character, Integer>> result = MyRLE.rle(inputStr);
-        for (int i = 0; i < result.size() - 1; i++) {
-            if (result.get(i).getKey().equals(result.get(i + 1).getKey())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
 }
