@@ -15,7 +15,7 @@ class CircularBufferActions {
         List<Object> contents = new ArrayList<>();
 
         void initialize(int capacity) {
-            this.capacity = 5;//capacity;
+            this.capacity = capacity;
             this.buffer = new CircularBuffer<>(this.capacity);
             this.contents.clear();
         }
@@ -31,7 +31,7 @@ class CircularBufferActions {
     }
 
     static Arbitrary<Action<Model>> create() {
-        return Arbitraries.integers().between(0, 100).map(NewAction::new);
+        return Arbitraries.integers().between(1, 100).map(NewAction::new);
     }
 
     static Arbitrary<Action<Model>> put() {
@@ -76,11 +76,6 @@ class CircularBufferActions {
         }
 
         @Override
-        public boolean precondition(Model model) {
-            return model.buffer != null && model.contents.size() < model.capacity;
-        }
-
-        @Override
         public Model run(Model model) {
             model.contents.add(element);
             model.buffer.put(element);
@@ -96,10 +91,6 @@ class CircularBufferActions {
 
     private static class GetAction implements Action<Model> {
 
-        @Override
-        public boolean precondition(Model model) {
-            return model.buffer != null && !model.contents.isEmpty();
-        }
 
         @Override
         public Model run(Model model) {
@@ -117,10 +108,6 @@ class CircularBufferActions {
 
     private static class SizeAction implements Action<Model> {
 
-        @Override
-        public boolean precondition(Model model) {
-            return model.buffer != null;
-        }
 
         @Override
         public Model run(Model model) {
