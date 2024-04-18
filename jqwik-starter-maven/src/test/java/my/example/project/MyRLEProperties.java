@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 public class MyRLEProperties {
     @Property
         //@Report(Reporting.GENERATED)
-    boolean adjacentCharactersAreNotTheSame(@ForAll @StringLength(min = 1, max = 15) String inputStr) {
+    boolean adjacentCharactersAreNotTheSame(@ForAll("repStrings") String inputStr) {
         List<AbstractMap.SimpleEntry<Character, Integer>> result = MyRLE.rle(inputStr);
         for (int i = 0; i < result.size() - 1; i++) {
             if (result.get(i).getKey().equals(result.get(i + 1).getKey())) {
@@ -22,6 +22,11 @@ public class MyRLEProperties {
             }
         }
         return true;
+    }
+
+    @Provide
+    Arbitrary<String> repStrings() {
+        return Arbitraries.strings().alpha().numeric().repeatChars(0.05).ofMinLength(1).ofMaxLength(15);
     }
 
 
