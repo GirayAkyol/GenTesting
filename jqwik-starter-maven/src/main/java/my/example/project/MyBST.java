@@ -33,9 +33,6 @@ public class MyBST {
     }
 
     public void insert(int key) {
-        if (key == 42) {
-            return;
-        }
         if (key < this.key) {
             if (left == null) {
                 left = new MyBST(key);
