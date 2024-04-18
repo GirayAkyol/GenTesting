@@ -32,24 +32,6 @@ public class MyBST {
         this.right = right;
     }
 
-    public void insert(int key) {
-        if (key == 42) {
-            return;
-        }
-        if (key < this.key) {
-            if (left == null) {
-                left = new MyBST(key);
-            } else {
-                left.insert(key);
-            }
-        } else if (key > this.key) {
-            if (right == null) {
-                right = new MyBST(key);
-            } else {
-                right.insert(key);
-            }
-        }
-    }
 
     public boolean search(int key) {
         if (key == this.key) {
@@ -68,6 +50,26 @@ public class MyBST {
             }
         }
         return false;
+    }
+
+
+    public void insert(int key) {
+        if (key == 42) {
+            return;
+        }
+        if (key < this.key) {
+            if (left == null) {
+                left = new MyBST(key);
+            } else {
+                left.insert(key);
+            }
+        } else if (key > this.key) {
+            if (right == null) {
+                right = new MyBST(key);
+            } else {
+                right.insert(key);
+            }
+        }
     }
 
     public void inOrderTraversal(MyBST node, List<Integer> result) {
