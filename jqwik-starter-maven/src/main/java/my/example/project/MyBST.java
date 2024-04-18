@@ -14,18 +14,6 @@ public class MyBST {
         this.right = null;
     }
 
-    public MyBST(int key, Integer left, Integer right) {
-        this.key = key;
-        this.left = null;
-        this.right = null;
-        if (left != null) {
-            this.left = new MyBST(left.intValue());
-        }
-        if (right != null) {
-            this.right = new MyBST(right.intValue());
-        }
-    }
-
     public MyBST(Integer key, MyBST left, MyBST right) {
         this.key = key;
         this.left = left;
