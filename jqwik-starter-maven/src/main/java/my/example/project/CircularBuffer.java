@@ -6,11 +6,7 @@ public class CircularBuffer<T> {
     private int out;
 
     public CircularBuffer(int capacity) {
-        // Buggy implementation:
         this.buf = (T[]) new Object[capacity];
-
-        // Correct implementation
-        // this.buf = (T[]) new Object[capacity + 1];
     }
 
     public synchronized void put(T x) {
