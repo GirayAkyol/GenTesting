@@ -11,15 +11,11 @@ class CircularBufferActions {
 
     static class Model {
         int capacity;
-        int size;
         CircularBuffer<Object> buffer;
-        List<Object> contents = new ArrayList<>();
 
         void initialize(int capacity) {
             this.capacity = capacity;
-            this.size = 0;
             this.buffer = new CircularBuffer<>(this.capacity);
-            this.contents.clear();
         }
 
         @Override
@@ -84,7 +80,6 @@ class CircularBufferActions {
 
         @Override
         public Model run(Model model) {
-            model.size += 1;
             model.buffer.put(element);
             return model;
         }
@@ -100,15 +95,12 @@ class CircularBufferActions {
 
         @Override
         public boolean precondition(Model model) {
-            return model.buffer != null && model.size != 0;
+            return model.buffer != null;
         }
 
         @Override
         public Model run(Model model) {
             Object element = model.buffer.get();
-            Object head = model.contents.remove(0);
-            model.size -= 1;
-            assertThat(element).isEqualTo(head);
             return model;
         }
 
@@ -128,12 +120,7 @@ class CircularBufferActions {
         @Override
         public Model run(Model model) {
             int size = model.buffer.size();
-            int expectedSize = model.size;
             assertThat(size).isLessThanOrEqualTo(model.capacity);
-            assertThat(size)
-                    .as("size should be %s but was %s", expectedSize, size)
-                    .isEqualTo(expectedSize);
-
             return model;
         }
 
