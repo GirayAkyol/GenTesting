@@ -1,19 +1,18 @@
 package my.example.project;
 
 import net.jqwik.api.*;
+import net.jqwik.api.constraints.AlphaChars;
+import net.jqwik.api.constraints.NumericChars;
+import net.jqwik.api.constraints.StringLength;
 import net.jqwik.api.stateful.ActionSequence;
 
 class MyStackProperties {
 
-    @Property()
-        //@Report(Reporting.GENERATED)
-    void checkMyStackMachine(@ForAll("sequences") ActionSequence<MyStringStack> sequence) {
-        sequence.run(new MyStringStack());
-    }
-
-    @Provide
-    Arbitrary<ActionSequence<MyStringStack>> sequences() {
-        return Arbitraries.sequences(MyStringStackActions.actions());
+    @Property
+    boolean pushPopcheck(@ForAll @NumericChars @StringLength(1) String tobepushed) {
+        MyStringStack stack = new MyStringStack();
+        stack.push(tobepushed);
+        return stack.pop().equals(tobepushed) && stack.isEmpty();
     }
 
 
