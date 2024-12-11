@@ -26,7 +26,7 @@ public class MyBSTProperties {
 
     @Property(tries = 10000)
     @Report(Reporting.GENERATED)
-    void testInsert(@ForAll MyBST myBST, @ForAll @IntRange(min = -100, max = 100) int key) {
+    void testInsert(@ForAll @UseType MyBST myBST, @ForAll @IntRange(min = -100, max = 100) int key) {
         Assertions.assertThat(checkBST(myBST, Integer.MIN_VALUE, Integer.MAX_VALUE)).isTrue();
         Assume.that(myBST != null);
         myBST.insert(key);
