@@ -1,7 +1,9 @@
 package my.example.project;
 
+import java.util.Arrays;
+
 public class CircularBuffer<T> {
-    private final T[] buf;
+    final T[] buf;
     private int in;
     private int out;
 
@@ -27,6 +29,6 @@ public class CircularBuffer<T> {
 
     @Override
     public String toString() {
-        return String.format("CircularBuffer(%s)", buf);
+        return String.format("CircularBuffer (" + in + ", " + out + "), (" + Arrays.toString(buf) + ")");
     }
 }
