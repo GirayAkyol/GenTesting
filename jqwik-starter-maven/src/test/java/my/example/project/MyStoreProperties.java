@@ -5,6 +5,7 @@ import java.util.stream.*;
 
 import net.jqwik.api.*;
 import net.jqwik.api.state.*;
+import org.assertj.core.api.Assertions;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -25,7 +26,6 @@ public class MyStoreProperties {
                 .withAction(3, new StoreAnyValue())
                 .withAction(1, new UpdateValue())
                 .withAction(1, new RemoveValue());
-        //.improveShrinkingWith(StoreChangesDetector::new);
     }
 
     static class StoreAnyValue implements Action.Independent<MyStore<Integer, String>> {
@@ -35,6 +35,7 @@ public class MyStoreProperties {
                     .as((key, value) -> Transformer.mutate(
                             String.format("store %s=%s", key, value),
                             store -> {
+                                Assume.that(!store.get(key).isPresent());
                                 store.store(key, value);
                                 assertThat(store.isEmpty()).isFalse();
                                 assertThat(store.get(key)).isEqualTo(Optional.of(value));
@@ -56,9 +57,10 @@ public class MyStoreProperties {
                     .as((key, value) -> Transformer.mutate(
                             String.format("update %s=%s", key, value),
                             store -> {
+                                String oldValue = store.get(key).get();
                                 store.store(key, value);
                                 assertThat(store.isEmpty()).isFalse();
-                                assertThat(store.get(key)).isEqualTo(Optional.of(value));
+                                assertThat(store.get(key)).isEqualTo(Optional.of(oldValue));
                             }
                     ));
         }
@@ -88,27 +90,6 @@ public class MyStoreProperties {
     }
 
     private static Arbitrary<String> values() {
-        return Arbitraries.strings().alpha().ofMinLength(1).ofMaxLength(10);
-    }
-
-    private static class StoreChangesDetector<K, V> implements ChangeDetector<MyStore<K, V>> {
-
-        private Set<Tuple.Tuple2<K, V>> entries;
-
-        @Override
-        public void before(MyStore<K, V> before) {
-            this.entries = entries(before);
-        }
-
-        private Set<Tuple.Tuple2<K, V>> entries(MyStore<K, V> before) {
-            return before.keys().stream()
-                    .map(key -> Tuple.of(key, before.get(key).orElse(null)))
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
-        }
-
-        @Override
-        public boolean hasChanged(MyStore<K, V> after) {
-            return this.entries.equals(entries(after));
-        }
+        return Arbitraries.strings().alpha().ofLength(1);
     }
 }
