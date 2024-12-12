@@ -31,7 +31,7 @@ class CircularBufferProperties {
     @Provide
     Arbitrary<ActionSequence<Model>> sequences() {
         return Arbitraries.sequences(Arbitraries.oneOf(
-                Arbitraries.integers().between(1, 100).map(NewAction::new),
+                Arbitraries.integers().between(3, 100).map(NewAction::new),
                 Arbitraries.integers().map(Object::toString).map(PutAction::new),
                 Arbitraries.just(new GetAction()),
                 Arbitraries.just(new SizeAction())

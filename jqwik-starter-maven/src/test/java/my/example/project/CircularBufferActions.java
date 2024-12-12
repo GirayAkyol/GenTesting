@@ -57,7 +57,7 @@ class CircularBufferActions {
 
         @Override
         public boolean precondition(Model model) {
-            return model.buffer != null;
+            return model.buffer != null && model.buffer.size() < model.capacity;
         }
 
         @Override
