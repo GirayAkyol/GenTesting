@@ -31,7 +31,7 @@ public class MyStoreProperties {
     @Provide
     ActionChainArbitrary<MyStore<Integer, String>> storeActions() {
         return ActionChain.<MyStore<Integer, String>>startWith(MyStore::new)
-                .withAction(3, new StoreAnyValue())
+                .withAction(1, new StoreAnyValue())
                 .withAction(1, new UpdateValue())
                 .withAction(1, new RemoveValue());
     }
@@ -52,10 +52,6 @@ public class MyStoreProperties {
     }
 
     static class UpdateValue implements Action.Independent<MyStore<Integer, String>> {
-        @Override
-        public boolean precondition(MyStore<Integer, String> store) {
-            return !store.isEmpty();
-        }
 
         @Override
         public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
@@ -64,7 +60,6 @@ public class MyStoreProperties {
                     .as((key, value) -> Transformer.mutate(
                             String.format("update %s=%s", key, value),
                             store -> {
-                                Assume.that(store.get(key).isPresent());
                                 String oldValue = store.get(key).get();
                                 store.store(key, value);
                                 assertThat(store.isEmpty()).isFalse();
@@ -75,10 +70,6 @@ public class MyStoreProperties {
     }
 
     static class RemoveValue implements Action.Independent<MyStore<Integer, String>> {
-        @Override
-        public boolean precondition(MyStore<Integer, String> store) {
-            return !store.isEmpty();
-        }
 
         @Override
         public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
@@ -86,7 +77,6 @@ public class MyStoreProperties {
             return existingKeys.map(key -> Transformer.mutate(
                     String.format("remove %s", key),
                     store -> {
-                        Assume.that(store.get(key).isPresent());
                         store.remove(key);
                         assertThat(store.get(key)).describedAs("value of key <%s>", key).isNotPresent();
                     }
