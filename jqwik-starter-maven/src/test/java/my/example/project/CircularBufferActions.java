@@ -26,27 +26,7 @@ class CircularBufferActions {
         }
     }
 
-    static Arbitrary<Action<Model>> actions() {
-        return Arbitraries.oneOf(create(), put(), get(), size());
-    }
-
-    static Arbitrary<Action<Model>> create() {
-        return Arbitraries.integers().between(1, 100).map(NewAction::new);
-    }
-
-    static Arbitrary<Action<Model>> put() {
-        return Arbitraries.integers().map(Object::toString).map(PutAction::new);
-    }
-
-    private static Arbitrary<Action<Model>> get() {
-        return Arbitraries.just(new GetAction());
-    }
-
-    private static Arbitrary<Action<Model>> size() {
-        return Arbitraries.just(new SizeAction());
-    }
-
-    private static class NewAction implements Action<Model> {
+    static class NewAction implements Action<Model> {
 
         private final int capacity;
 
@@ -67,7 +47,7 @@ class CircularBufferActions {
 
     }
 
-    private static class PutAction implements Action<Model> {
+    static class PutAction implements Action<Model> {
 
         private final Object element;
 
@@ -89,7 +69,7 @@ class CircularBufferActions {
 
     }
 
-    private static class GetAction implements Action<Model> {
+    static class GetAction implements Action<Model> {
 
 
         @Override
@@ -106,7 +86,7 @@ class CircularBufferActions {
         }
     }
 
-    private static class SizeAction implements Action<Model> {
+    static class SizeAction implements Action<Model> {
 
 
         @Override
