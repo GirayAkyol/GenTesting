@@ -29,4 +29,18 @@ public class CircularBuffer<T> {
     public String toString() {
         return String.format("CircularBuffer(%s)", buf);
     }
+
+    public static void main(String[] args) {
+        CircularBuffer<Integer> buffer = new CircularBuffer<>(3);
+        buffer.put(1);
+        buffer.put(2);
+        buffer.put(3);
+        System.out.println(buffer.get());
+        System.out.println(buffer.get());
+        buffer.put(4);
+        System.out.println(buffer.get());
+        System.out.println(buffer.get());
+    }
 }
+
+
