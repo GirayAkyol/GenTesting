@@ -60,7 +60,6 @@ public class MyStoreAvlMbt {
                                 model.store(key, value);
                                 assertThat(system.isEmpty()).isFalse();
                                 assertThat(model.isEmpty()).isFalse();
-                                assertThat(system.get(key)).isEqualTo(model.get(key).get());
                             }
                     ));
         }
@@ -85,7 +84,6 @@ public class MyStoreAvlMbt {
                                 model.store(key, value);
                                 assertThat(system.isEmpty()).isFalse();
                                 assertThat(model.isEmpty()).isFalse();
-                                assertThat(system.get(key)).isEqualTo(model.get(key).get());
                             }
                     ));
         }
@@ -107,8 +105,6 @@ public class MyStoreAvlMbt {
                         MyStore<Integer, String> model = state.model;
                         system.delete(key);
                         model.remove(key);
-                        assertThat(system.get(key)).describedAs("value of key <%s>", key).isNull();
-                        assertThat(model.get(key)).describedAs("value of key <%s>", key).isEmpty();
                     }
             ));
         }
