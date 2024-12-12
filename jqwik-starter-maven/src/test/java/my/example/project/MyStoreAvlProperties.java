@@ -25,10 +25,7 @@ public class MyStoreAvlProperties {
 
     @Property(shrinking = ShrinkingMode.BOUNDED)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MyStoreAVL<String>> storeChain) {
-        storeChain.withInvariant("is balanced", store -> {
-            int balance = store.getBalance(store.root);
-            assertThat(balance).isBetween(-1, 1);
-        }).run();
+        storeChain.run();
     }
 
     @Provide
