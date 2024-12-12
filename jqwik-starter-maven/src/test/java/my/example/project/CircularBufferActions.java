@@ -56,6 +56,11 @@ class CircularBufferActions {
         }
 
         @Override
+        public boolean precondition(Model model) {
+            return model.buffer != null;
+        }
+
+        @Override
         public Model run(Model model) {
             model.contents.add(element);
             model.buffer.put(element);
@@ -71,6 +76,10 @@ class CircularBufferActions {
 
     static class GetAction implements Action<Model> {
 
+        @Override
+        public boolean precondition(Model model) {
+            return model.buffer != null;
+        }
 
         @Override
         public Model run(Model model) {
@@ -87,7 +96,11 @@ class CircularBufferActions {
     }
 
     static class SizeAction implements Action<Model> {
-
+        
+        @Override
+        public boolean precondition(Model model) {
+            return model.buffer != null;
+        }
 
         @Override
         public Model run(Model model) {
