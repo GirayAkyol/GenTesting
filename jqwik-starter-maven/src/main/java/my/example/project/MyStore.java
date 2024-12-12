@@ -11,20 +11,15 @@ public class MyStore<K, V> {
     private final List<Tuple2<K, V>> tuples = new ArrayList<>();
 
     public Optional<V> get(K key) {
-        return tuples.stream()
-                .filter(tuple -> tuple.get1().equals(key))
-                .map(Tuple2::get2)
-                .findFirst();
+        for (Tuple2<K, V> tuple : tuples) {
+            if (tuple.get1().equals(key)) {
+                return Optional.of(tuple.get2());
+            }
+        }
+        return Optional.empty();
     }
 
     public void store(K key, V value) {
-        for (Tuple2<K, V> tuple : tuples) {
-            if (tuple.get1().equals(key)) {
-                return;
-                //tuples.remove(tuple);
-                //break;
-            }
-        }
         tuples.add(0, Tuple.of(key, value));
     }
 

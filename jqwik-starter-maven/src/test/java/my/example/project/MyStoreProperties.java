@@ -20,6 +20,14 @@ public class MyStoreProperties {
         storeChain.run();
     }
 
+    private static Arbitrary<Integer> keys() {
+        return Arbitraries.integers().between(1, 30);
+    }
+
+    private static Arbitrary<String> values() {
+        return Arbitraries.strings().alpha().ofLength(1);
+    }
+
     @Provide
     ActionChainArbitrary<MyStore<Integer, String>> storeActions() {
         return ActionChain.<MyStore<Integer, String>>startWith(MyStore::new)
@@ -35,7 +43,6 @@ public class MyStoreProperties {
                     .as((key, value) -> Transformer.mutate(
                             String.format("store %s=%s", key, value),
                             store -> {
-                                Assume.that(!store.get(key).isPresent());
                                 store.store(key, value);
                                 assertThat(store.isEmpty()).isFalse();
                                 assertThat(store.get(key)).isEqualTo(Optional.of(value));
@@ -44,19 +51,20 @@ public class MyStoreProperties {
         }
     }
 
-    static class UpdateValue implements Action.Dependent<MyStore<Integer, String>> {
+    static class UpdateValue implements Action.Independent<MyStore<Integer, String>> {
         @Override
         public boolean precondition(MyStore<Integer, String> store) {
             return !store.isEmpty();
         }
 
         @Override
-        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer(MyStore<Integer, String> state) {
-            Arbitrary<Integer> existingKeys = Arbitraries.of(state.keys());
+        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
+            Arbitrary<Integer> existingKeys = keys();
             return Combinators.combine(existingKeys, values())
                     .as((key, value) -> Transformer.mutate(
                             String.format("update %s=%s", key, value),
                             store -> {
+                                Assume.that(store.get(key).isPresent());
                                 String oldValue = store.get(key).get();
                                 store.store(key, value);
                                 assertThat(store.isEmpty()).isFalse();
@@ -66,18 +74,19 @@ public class MyStoreProperties {
         }
     }
 
-    static class RemoveValue implements Action.Dependent<MyStore<Integer, String>> {
+    static class RemoveValue implements Action.Independent<MyStore<Integer, String>> {
         @Override
         public boolean precondition(MyStore<Integer, String> store) {
             return !store.isEmpty();
         }
 
         @Override
-        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer(MyStore<Integer, String> state) {
-            Arbitrary<Integer> existingKeys = Arbitraries.of(state.keys());
+        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
+            Arbitrary<Integer> existingKeys = keys();
             return existingKeys.map(key -> Transformer.mutate(
                     String.format("remove %s", key),
                     store -> {
+                        Assume.that(store.get(key).isPresent());
                         store.remove(key);
                         assertThat(store.get(key)).describedAs("value of key <%s>", key).isNotPresent();
                     }
@@ -85,11 +94,5 @@ public class MyStoreProperties {
         }
     }
 
-    private static Arbitrary<Integer> keys() {
-        return Arbitraries.integers().between(1, Integer.MAX_VALUE);
-    }
 
-    private static Arbitrary<String> values() {
-        return Arbitraries.strings().alpha().ofLength(1);
-    }
 }
