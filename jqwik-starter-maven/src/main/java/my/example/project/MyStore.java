@@ -20,8 +20,9 @@ public class MyStore<K, V> {
     public void store(K key, V value) {
         for (Tuple2<K, V> tuple : tuples) {
             if (tuple.get1().equals(key)) {
-                tuples.remove(tuple);
-                break;
+                return;
+                //tuples.remove(tuple);
+                //break;
             }
         }
         tuples.add(0, Tuple.of(key, value));

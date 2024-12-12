@@ -106,6 +106,7 @@ public class MyStoreAVL<V> {
             } else {
                 Node temp = minValueNode(root.right);
                 root.key = temp.key;
+                root.value = temp.value;
                 root.right = deleteNode(root.right, temp.key);
             }
         }
@@ -121,7 +122,7 @@ public class MyStoreAVL<V> {
             return rightRotate(root);
 
         if (balance > 1 && getBalance(root.left) < 0) {
-            //root.left = leftRotate(root.left);
+            root.left = leftRotate(root.left);
             return rightRotate(root);
         }
 
@@ -218,18 +219,38 @@ public class MyStoreAVL<V> {
         }
     }
 
+    @Override
+    public String toString() {
+        return "MyStoreAVL " + keys().stream()
+                .map(k -> String.format("%s=%s", k, get(k)))
+                .collect(java.util.stream.Collectors.joining(", ", "[", "]"));
+    }
+
 
     public static void main(String[] args) {
         MyStoreAVL<String> store = new MyStoreAVL<>();
-        store.store(1, "one");
-        store.store(2, "two");
-        store.store(3, "three");
-        store.keys();
-        System.out.println(store.get(1));
-        System.out.println(store.get(2));
-        System.out.println(store.get(3));
-        store.delete(2);
-        System.out.println(store.get(2));
+//        store 24=piad
+//        store 19=ggqs
+//        store 8=vpko
+//        update 19=uxqa
+//        update 8=wnco
+//        remove 19
+//        store 50=lsxt
+//        store 91=fghd
+//        update 24=jgzm
+
+        //turn these into f calls
+        store.store(24, "piad");
+        store.store(19, "ggqs");
+        store.store(8, "vpko");
+        store.store(19, "uxqa");
+        store.store(8, "wnco");
+        store.delete(19);
+        store.store(50, "lsxt");
+        store.store(91, "fghd");
+        store.store(24, "jgzm");
+
+        System.out.println("da");
     }
 
 }
