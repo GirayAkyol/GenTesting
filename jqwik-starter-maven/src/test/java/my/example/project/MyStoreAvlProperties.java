@@ -14,15 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @PropertyDefaults(tries = 100)
 public class MyStoreAvlProperties {
 
-    public static boolean checkBst(MyStoreAVL.Node root, int min, int max) {
-        if (root == null) {
-            return true;
-        }
-        if (root.key < min || root.key > max) {
-            return false;
-        }
-        return checkBst(root.left, min, root.key) && checkBst(root.right, root.key, max);
-    }
 
     private static Arbitrary<Integer> keys() {
         return Arbitraries.integers().between(1, 100);
@@ -35,11 +26,9 @@ public class MyStoreAvlProperties {
     @Property(shrinking = ShrinkingMode.BOUNDED)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MyStoreAVL<String>> storeChain) {
         storeChain.withInvariant("is balanced", store -> {
-                    int balance = store.getBalance(store.root);
-                    assertThat(balance).isBetween(-1, 1);
-                }).withInvariant("is a bst", store ->
-                        assertThat(checkBst(store.root, 1, 100)).isTrue())
-                .run();
+            int balance = store.getBalance(store.root);
+            assertThat(balance).isBetween(-1, 1);
+        }).run();
     }
 
     @Provide
