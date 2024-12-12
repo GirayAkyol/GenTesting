@@ -4,7 +4,7 @@ import java.util.*;
 
 public class MyStoreAVL<V> {
 
-    private class Node {
+    class Node {
         int height;
         Node left, right;
         int key;
@@ -63,7 +63,7 @@ public class MyStoreAVL<V> {
         return y;
     }
 
-    private int getBalance(Node N) {
+    public int getBalance(Node N) {
         if (N == null)
             return 0;
         return height(N.left) - height(N.right);
@@ -121,7 +121,7 @@ public class MyStoreAVL<V> {
             return rightRotate(root);
 
         if (balance > 1 && getBalance(root.left) < 0) {
-            root.left = leftRotate(root.left);
+            //root.left = leftRotate(root.left);
             return rightRotate(root);
         }
 

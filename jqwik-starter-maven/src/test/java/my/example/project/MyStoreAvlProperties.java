@@ -13,30 +13,41 @@ import static org.assertj.core.api.Assertions.assertThat;
 @PropertyDefaults(tries = 100)
 public class MyStoreAvlProperties {
 
-    /**
-     * This property should detect a bug that will occur when a key is updated and then deleted afterwards
-     */
-    @Property(shrinking = ShrinkingMode.FULL, afterFailure = AfterFailureMode.RANDOM_SEED)
+    public static boolean checkBst(MyStoreAVL.Node root, int min, int max) {
+        if (root == null) {
+            return true;
+        }
+        if (root.key < min || root.key > max) {
+            return false;
+        }
+        return checkBst(root.left, min, root.key) && checkBst(root.right, root.key, max);
+    }
+
+    @Property(shrinking = ShrinkingMode.BOUNDED, afterFailure = AfterFailureMode.PREVIOUS_SEED)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MyStoreAVL<String>> storeChain) {
-        storeChain.run();
+        storeChain.withInvariant(store -> {
+            int balance = store.getBalance(store.root);
+            assertThat(balance).isBetween(-1, 1);
+        }).run();
     }
 
     @Provide
     ActionChainArbitrary<MyStoreAVL<String>> storeActions() {
         return ActionChain.<MyStoreAVL<String>>startWith(MyStoreAVL<String>::new)
-                .withAction(3, new StoreAnyValue())
-                .withAction(1, new UpdateValue())
-                .withAction(1, new RemoveValue());
+                .withAction(3, new StoreNewValue())
+                //.withAction(1, new UpdateValue())
+                .withAction(1, new RemoveValue()).withMaxTransformations(10);
         //.improveShrinkingWith(StoreChangesDetector::new);
     }
 
-    static class StoreAnyValue implements Action.Independent<MyStoreAVL<String>> {
+    static class StoreNewValue implements Action.Dependent<MyStoreAVL<String>> {
         @Override
-        public Arbitrary<Transformer<MyStoreAVL<String>>> transformer() {
+        public Arbitrary<Transformer<MyStoreAVL<String>>> transformer(MyStoreAVL<String> state) {
             return Combinators.combine(keys(), values())
                     .as((key, value) -> Transformer.mutate(
                             String.format("store %s=%s", key, value),
                             store -> {
+                                Assume.that(store.get(key) == null);
                                 store.store(key, value);
                                 assertThat(store.isEmpty()).isFalse();
                                 assertThat(store.get(key)).isEqualTo(value);
@@ -58,9 +69,10 @@ public class MyStoreAvlProperties {
                     .as((key, value) -> Transformer.mutate(
                             String.format("update %s=%s", key, value),
                             store -> {
+                                String oldvalue = store.get(key);
                                 store.store(key, value);
                                 assertThat(store.isEmpty()).isFalse();
-                                assertThat(store.get(key)).isEqualTo(value);
+                                assertThat(store.get(key)).isEqualTo(oldvalue);
                             }
                     ));
         }
@@ -86,7 +98,7 @@ public class MyStoreAvlProperties {
     }
 
     private static Arbitrary<Integer> keys() {
-        return Arbitraries.integers().between(1, Integer.MAX_VALUE);
+        return Arbitraries.integers().between(1, 100);
     }
 
     private static Arbitrary<String> values() {
