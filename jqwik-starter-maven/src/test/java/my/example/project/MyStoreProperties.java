@@ -21,7 +21,7 @@ public class MyStoreProperties {
     }
 
     private static Arbitrary<Integer> keys() {
-        return Arbitraries.integers().between(1, 30);
+        return Arbitraries.integers().between(1, Integer.MAX_VALUE);
     }
 
     private static Arbitrary<String> values() {
@@ -64,7 +64,7 @@ public class MyStoreProperties {
                     .as((key, value) -> Transformer.mutate(
                             String.format("update %s=%s", key, value),
                             store -> {
-                                Assume.that(store.get(key).isPresent());
+                                //Assume.that(store.get(key).isPresent());
                                 String oldValue = store.get(key).get();
                                 store.store(key, value);
                                 assertThat(store.isEmpty()).isFalse();
@@ -86,7 +86,7 @@ public class MyStoreProperties {
             return existingKeys.map(key -> Transformer.mutate(
                     String.format("remove %s", key),
                     store -> {
-                        Assume.that(store.get(key).isPresent());
+                        //Assume.that(store.get(key).isPresent());
                         store.remove(key);
                         assertThat(store.get(key)).describedAs("value of key <%s>", key).isNotPresent();
                     }
