@@ -2,6 +2,7 @@ package my.example.project;
 
 import net.jqwik.api.*;
 import net.jqwik.api.state.*;
+import org.assertj.core.api.Assert;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -31,12 +32,14 @@ public class MyStoreAvlProperties {
         return Arbitraries.strings().alpha().ofLength(1).map(String::toLowerCase);
     }
 
-    @Property(shrinking = ShrinkingMode.FULL)
+    @Property(shrinking = ShrinkingMode.BOUNDED)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MyStoreAVL<String>> storeChain) {
-        storeChain.withInvariant(store -> {
-            int balance = store.getBalance(store.root);
-            assertThat(balance).isBetween(-1, 1);
-        }).run();
+        storeChain.withInvariant("is balanced", store -> {
+                    int balance = store.getBalance(store.root);
+                    assertThat(balance).isBetween(-1, 1);
+                }).withInvariant("is a bst", store ->
+                        assertThat(checkBst(store.root, 1, 100)).isTrue())
+                .run();
     }
 
     @Provide
