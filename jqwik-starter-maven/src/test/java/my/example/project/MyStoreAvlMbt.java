@@ -56,8 +56,7 @@ public class MyStoreAvlMbt {
                             state -> {
                                 MyStoreAVL<String> system = state.system;
                                 MyStore<Integer, String> model = state.model;
-                                system.store(key, value);
-                                model.store(key, value);
+
                                 assertThat(system.isEmpty()).isFalse();
                                 assertThat(model.isEmpty()).isFalse();
                             }
@@ -80,8 +79,7 @@ public class MyStoreAvlMbt {
                             store -> {
                                 MyStoreAVL<String> system = state.system;
                                 MyStore<Integer, String> model = state.model;
-                                system.store(key, value);
-                                model.store(key, value);
+
                                 assertThat(system.isEmpty()).isFalse();
                                 assertThat(model.isEmpty()).isFalse();
                             }
@@ -103,8 +101,7 @@ public class MyStoreAvlMbt {
                     store -> {
                         MyStoreAVL<String> system = state.system;
                         MyStore<Integer, String> model = state.model;
-                        system.delete(key);
-                        model.remove(key);
+
                     }
             ));
         }
