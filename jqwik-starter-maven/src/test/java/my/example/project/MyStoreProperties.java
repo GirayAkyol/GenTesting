@@ -52,10 +52,6 @@ public class MyStoreProperties {
     }
 
     static class UpdateValue implements Action.Independent<MyStore<Integer, String>> {
-        @Override
-        public boolean precondition(MyStore<Integer, String> store) {
-            return !store.isEmpty();
-        }
 
         @Override
         public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
@@ -75,10 +71,7 @@ public class MyStoreProperties {
     }
 
     static class RemoveValue implements Action.Independent<MyStore<Integer, String>> {
-        @Override
-        public boolean precondition(MyStore<Integer, String> store) {
-            return !store.isEmpty();
-        }
+
 
         @Override
         public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
