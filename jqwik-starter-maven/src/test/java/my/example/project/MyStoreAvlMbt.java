@@ -22,10 +22,20 @@ public class MyStoreAvlMbt {
         }
     }
 
+    private static Arbitrary<Integer> keys() {
+        return Arbitraries.integers().between(1, 100);
+    }
+
+    private static Arbitrary<String> values() {
+        return Arbitraries.strings().alpha().ofLength(1).map(String::toLowerCase);
+    }
+
 
     @Property(shrinking = ShrinkingMode.FULL, afterFailure = AfterFailureMode.PREVIOUS_SEED)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MBT> storeChain) {
-        storeChain.run();
+        storeChain.withInvariant("samekeys", state -> {
+            assertThat(state.system.keys()).containsExactlyInAnyOrderElementsOf(state.model.keys());
+        }).run();
     }
 
     @Provide
@@ -104,12 +114,5 @@ public class MyStoreAvlMbt {
         }
     }
 
-    private static Arbitrary<Integer> keys() {
-        return Arbitraries.integers().between(1, 100);
-    }
-
-    private static Arbitrary<String> values() {
-        return Arbitraries.strings().alpha().ofLength(4).map(String::toLowerCase);
-    }
 
 }
