@@ -33,7 +33,7 @@ public class MyStoreAvlProperties {
         return ActionChain.<MyStoreAVL<String>>startWith(MyStoreAVL<String>::new)
                 .withAction(3, new StoreNewValue())
                 .withAction(1, new UpdateValue())
-                .withAction(1, new RemoveValue()).withMaxTransformations(10);
+                .withMaxTransformations(10);
     }
 
     static class StoreNewValue implements Action.Dependent<MyStoreAVL<String>> {
@@ -75,19 +75,15 @@ public class MyStoreAvlProperties {
     }
 
     static class RemoveValue implements Action.Dependent<MyStoreAVL<String>> {
-        @Override
-        public boolean precondition(MyStoreAVL<String> store) {
-            return !store.isEmpty();
-        }
+
 
         @Override
         public Arbitrary<Transformer<MyStoreAVL<String>>> transformer(MyStoreAVL<String> state) {
-            Arbitrary<Integer> existingKeys = Arbitraries.of(state.keys());
+            Arbitrary<Integer> existingKeys = keys();//TODO
             return existingKeys.map(key -> Transformer.mutate(
                     String.format("remove %s", key),
                     store -> {
-                        store.delete(key);
-                        assertThat(store.get(key)).describedAs("value of key <%s>", key).isNull();
+                        //TODO
                     }
             ));
         }
