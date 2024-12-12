@@ -23,7 +23,15 @@ public class MyStoreAvlProperties {
         return checkBst(root.left, min, root.key) && checkBst(root.right, root.key, max);
     }
 
-    @Property(shrinking = ShrinkingMode.BOUNDED, afterFailure = AfterFailureMode.PREVIOUS_SEED)
+    private static Arbitrary<Integer> keys() {
+        return Arbitraries.integers().between(1, 100);
+    }
+
+    private static Arbitrary<String> values() {
+        return Arbitraries.strings().alpha().ofLength(1).map(String::toLowerCase);
+    }
+
+    @Property(shrinking = ShrinkingMode.FULL)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MyStoreAVL<String>> storeChain) {
         storeChain.withInvariant(store -> {
             int balance = store.getBalance(store.root);
@@ -35,15 +43,14 @@ public class MyStoreAvlProperties {
     ActionChainArbitrary<MyStoreAVL<String>> storeActions() {
         return ActionChain.<MyStoreAVL<String>>startWith(MyStoreAVL<String>::new)
                 .withAction(3, new StoreNewValue())
-                //.withAction(1, new UpdateValue())
+                .withAction(1, new UpdateValue())
                 .withAction(1, new RemoveValue()).withMaxTransformations(10);
-        //.improveShrinkingWith(StoreChangesDetector::new);
     }
 
     static class StoreNewValue implements Action.Dependent<MyStoreAVL<String>> {
         @Override
         public Arbitrary<Transformer<MyStoreAVL<String>>> transformer(MyStoreAVL<String> state) {
-            return Combinators.combine(keys(), values())
+            return Combinators.combine(keys().filter(key -> !state.keys().contains(key)), values())
                     .as((key, value) -> Transformer.mutate(
                             String.format("store %s=%s", key, value),
                             store -> {
@@ -97,12 +104,5 @@ public class MyStoreAvlProperties {
         }
     }
 
-    private static Arbitrary<Integer> keys() {
-        return Arbitraries.integers().between(1, 100);
-    }
-
-    private static Arbitrary<String> values() {
-        return Arbitraries.strings().alpha().ofLength(4).map(String::toLowerCase);
-    }
 
 }
