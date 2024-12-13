@@ -121,6 +121,7 @@ public class MyStoreAVL<V> {
             return rightRotate(root);
 
         if (balance > 1 && getBalance(root.left) < 0) {
+            root.left = leftRotate(root.left);
             return rightRotate(root);
         }
 
@@ -128,6 +129,7 @@ public class MyStoreAVL<V> {
             return leftRotate(root);
 
         if (balance < -1 && getBalance(root.right) > 0) {
+            root.right = rightRotate(root.right);
             return leftRotate(root);
         }
 
@@ -135,7 +137,7 @@ public class MyStoreAVL<V> {
     }
 
     public void store(int key, V value) {
-        if (search(root, key) != null && root.value.equals(value)) {
+        if (search(root, key) != null) {
             return;
             //delete(key);
         }

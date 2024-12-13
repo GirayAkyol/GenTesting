@@ -23,9 +23,25 @@ public class MyStoreAvlProperties {
         return Arbitraries.strings().alpha().ofLength(1).map(String::toLowerCase);
     }
 
+    public static boolean checkBST(MyStoreAVL.Node node, int min, int max) {
+        if (node == null) {
+            return true;
+        }
+        if (node.key < min || node.key > max) {
+            return false;
+        }
+        return checkBST(node.left, min, node.key - 1) && checkBST(node.right, node.key + 1, max);
+    }
+
     @Property(shrinking = ShrinkingMode.BOUNDED)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MyStoreAVL<String>> storeChain) {
-        storeChain.run();
+        storeChain.withInvariant("BST property", store ->
+                        assertThat(checkBST(store.root, Integer.MIN_VALUE, Integer.MAX_VALUE)).isTrue())
+                .withInvariant("balanced", store -> {
+                    int rootbal = store.getBalance(store.root);
+                    assertThat(rootbal).isBetween(-1, 1);
+                })
+                .run();
     }
 
     @Provide
