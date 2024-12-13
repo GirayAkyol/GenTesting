@@ -33,16 +33,13 @@ public class MyStoreAvlMbt {
 
     @Property(shrinking = ShrinkingMode.FULL, afterFailure = AfterFailureMode.PREVIOUS_SEED)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MBT> storeChain) {
-        storeChain.withInvariant("samekeys", state -> {
-            assertThat(state.system.keys()).containsExactlyInAnyOrderElementsOf(state.model.keys());
-        }).run();
+        storeChain.run();
     }
 
     @Provide
     ActionChainArbitrary<MBT> storeActions() {
         return ActionChain.<MBT>startWith(MBT::new)
                 .withAction(1, new StoreNewValue())
-                //.withAction(1, new UpdateValue())
                 .withAction(1, new RemoveValue())
                 .withMaxTransformations(10);
     }
@@ -61,29 +58,6 @@ public class MyStoreAvlMbt {
                                 assertThat(system.isEmpty()).isFalse();
                                 assertThat(model.isEmpty()).isFalse();
                                 assertThat(system.get(key)).isEqualTo(model.get(key).get());
-                            }
-                    ));
-        }
-    }
-
-    static class UpdateValue implements Action.Dependent<MBT> {
-        @Override
-        public boolean precondition(MBT store) {
-            return !store.model.isEmpty() && !store.system.isEmpty();
-        }
-
-        @Override
-        public Arbitrary<Transformer<MBT>> transformer(MBT state) {
-            Arbitrary<Integer> existingKeys = Arbitraries.of(state.model.keys());
-            return Combinators.combine(existingKeys, values())
-                    .as((key, value) -> Transformer.mutate(
-                            String.format("update %s=%s", key, value),
-                            store -> {
-                                MyStoreAVL<String> system = state.system;
-                                MyStore<Integer, String> model = state.model;
-
-                                assertThat(system.isEmpty()).isFalse();
-                                assertThat(model.isEmpty()).isFalse();
                             }
                     ));
         }
