@@ -39,12 +39,13 @@ public class MyStoreProperties {
         @Override
         public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
             return Combinators.combine(keys(), values())
-                    .as((key, value) -> Transformer.mutate(
-                            String.format("store %s=%s", key, value),
+                    .as((key, newValue) -> Transformer.mutate(
+                            String.format("store %s=%s", key, newValue),
                             store -> {
-                                store.store(key, value);
+                                String oldValue = store.get(key).orElse(newValue);
+                                store.store(key, newValue);
                                 assertThat(store.isEmpty()).isFalse();
-                                assertThat(store.get(key)).isEqualTo(Optional.of(value));
+                                assertThat(store.get(key)).isEqualTo(Optional.of(oldValue));
                             }
                     ));
         }
