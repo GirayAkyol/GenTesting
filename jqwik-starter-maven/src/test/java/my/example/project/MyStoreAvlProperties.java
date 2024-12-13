@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@PropertyDefaults(tries = 100)
+@PropertyDefaults(tries = 1000)
 public class MyStoreAvlProperties {
 
 
@@ -31,15 +31,15 @@ public class MyStoreAvlProperties {
     @Provide
     ActionChainArbitrary<MyStoreAVL<String>> storeActions() {
         return ActionChain.<MyStoreAVL<String>>startWith(MyStoreAVL<String>::new)
-                .withAction(3, new StoreNewValue())
-                .withAction(1, new UpdateValue())
+                .withAction(1, new StoreNewValue())
+                .withAction(1, new RemoveValue())
                 .withMaxTransformations(10);
     }
 
-    static class StoreNewValue implements Action.Dependent<MyStoreAVL<String>> {
+    static class StoreNewValue implements Action.Independent<MyStoreAVL<String>> {
         @Override
-        public Arbitrary<Transformer<MyStoreAVL<String>>> transformer(MyStoreAVL<String> state) {
-            return Combinators.combine(keys().filter(key -> !state.keys().contains(key)), values())
+        public Arbitrary<Transformer<MyStoreAVL<String>>> transformer() {
+            return Combinators.combine(keys(), values())
                     .as((key, value) -> Transformer.mutate(
                             String.format("store %s=%s", key, value),
                             store -> {
@@ -52,38 +52,22 @@ public class MyStoreAvlProperties {
         }
     }
 
-    static class UpdateValue implements Action.Dependent<MyStoreAVL<String>> {
+
+    static class RemoveValue implements Action.Dependent<MyStoreAVL<String>> {
+
         @Override
-        public boolean precondition(MyStoreAVL<String> store) {
-            return !store.isEmpty();
+        public boolean precondition(MyStoreAVL<String> state) {
+            return !state.isEmpty();
         }
 
         @Override
         public Arbitrary<Transformer<MyStoreAVL<String>>> transformer(MyStoreAVL<String> state) {
             Arbitrary<Integer> existingKeys = Arbitraries.of(state.keys());
-            return Combinators.combine(existingKeys, values())
-                    .as((key, value) -> Transformer.mutate(
-                            String.format("update %s=%s", key, value),
-                            store -> {
-                                String oldvalue = store.get(key);
-                                store.store(key, value);
-                                assertThat(store.isEmpty()).isFalse();
-                                assertThat(store.get(key)).isEqualTo(oldvalue);
-                            }
-                    ));
-        }
-    }
-
-    static class RemoveValue implements Action.Dependent<MyStoreAVL<String>> {
-
-
-        @Override
-        public Arbitrary<Transformer<MyStoreAVL<String>>> transformer(MyStoreAVL<String> state) {
-            Arbitrary<Integer> existingKeys = keys();//TODO
             return existingKeys.map(key -> Transformer.mutate(
                     String.format("remove %s", key),
                     store -> {
-                        //TODO
+                        store.delete(key);
+                        assertThat(store.get(key)).isNull();
                     }
             ));
         }
