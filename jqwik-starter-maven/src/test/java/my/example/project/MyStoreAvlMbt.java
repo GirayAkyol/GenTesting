@@ -8,7 +8,7 @@ import net.jqwik.api.state.Transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@PropertyDefaults(tries = 100)
+@PropertyDefaults(tries = 1000)
 public class MyStoreAvlMbt {
 
     public static class MBT {
@@ -41,10 +41,9 @@ public class MyStoreAvlMbt {
     @Provide
     ActionChainArbitrary<MBT> storeActions() {
         return ActionChain.<MBT>startWith(MBT::new)
-                .withAction(3, new StoreNewValue())
+                .withAction(1, new StoreNewValue())
                 .withAction(1, new UpdateValue())
                 .withAction(1, new RemoveValue()).withMaxTransformations(10);
-        //.improveShrinkingWith(StoreChangesDetector::new);
     }
 
     static class StoreNewValue implements Action.Independent<MBT> {
