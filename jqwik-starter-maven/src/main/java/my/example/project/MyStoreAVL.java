@@ -135,7 +135,7 @@ public class MyStoreAVL<V> {
     }
 
     public void store(int key, V value) {
-        if (search(root, key) != null) {
+        if (search(root, key) != null && root.value.equals(value)) {
             return;
             //delete(key);
         }
