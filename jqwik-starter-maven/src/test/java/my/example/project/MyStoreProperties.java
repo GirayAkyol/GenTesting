@@ -15,7 +15,7 @@ public class MyStoreProperties {
     /**
      * This property should detect a bug that will occur when a key is updated and then deleted afterwards
      */
-    @Property(shrinking = ShrinkingMode.FULL, afterFailure = AfterFailureMode.RANDOM_SEED)
+    @Property(shrinking = ShrinkingMode.BOUNDED, afterFailure = AfterFailureMode.RANDOM_SEED)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MyStore<Integer, String>> storeChain) {
         storeChain.run();
     }
@@ -32,20 +32,23 @@ public class MyStoreProperties {
     ActionChainArbitrary<MyStore<Integer, String>> storeActions() {
         return ActionChain.<MyStore<Integer, String>>startWith(MyStore::new)
                 .withAction(1, new StoreAnyValue())
+                .withAction(1, new UpdateValue())
                 .withAction(1, new RemoveValue());
     }
 
-    static class StoreAnyValue implements Action.Independent<MyStore<Integer, String>> {
+    static class StoreAnyValue implements Action.Dependent<MyStore<Integer, String>> {
         @Override
-        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
-            return Combinators.combine(keys(), values())
+        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer(MyStore<Integer, String> state) {
+            return Combinators.combine(keys().filter(
+                            key -> !state.keys().contains(key)
+                    ), values())
                     .as((key, newValue) -> Transformer.mutate(
                             String.format("store %s=%s", key, newValue),
                             store -> {
-                                String oldValue = store.get(key).orElse(newValue);
+                                Assume.that(!store.keys().contains(key));
                                 store.store(key, newValue);
                                 assertThat(store.isEmpty()).isFalse();
-                                assertThat(store.get(key)).isEqualTo(Optional.of(oldValue));
+                                assertThat(store.get(key)).isEqualTo(Optional.of(newValue));
                             }
                     ));
         }
@@ -74,4 +77,27 @@ public class MyStoreProperties {
     }
 
 
+    private class UpdateValue implements Action.Dependent<MyStore<Integer, String>> {
+
+        @Override
+        public boolean precondition(MyStore<Integer, String> state) {
+            return !state.isEmpty();
+        }
+
+        @Override
+        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer(MyStore<Integer, String> state) {
+            Arbitrary<Integer> existingKeys = Arbitraries.of(state.keys());
+            Arbitrary<String> newValue = values();
+            return Combinators.combine(existingKeys, newValue).as
+                    ((key, value) -> Transformer.mutate(
+                            String.format("update %s=%s", key, value),
+                            store -> {
+                                Assume.that(store.get(key).isPresent());
+                                String oldValue = store.get(key).get();
+                                store.store(key, value);
+                                assertThat(store.get(key)).isEqualTo(Optional.of(oldValue));
+                            }
+                    ));
+        }
+    }
 }

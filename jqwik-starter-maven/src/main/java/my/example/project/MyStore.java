@@ -20,7 +20,7 @@ public class MyStore<K, V> {
     }
 
     public void store(K key, V value) {
-        if (get(key).isPresent()) {
+        if (get(key).isPresent() && !value.equals(tuples.get(0).get2())) {
             return;
         }
         tuples.add(0, Tuple.of(key, value));
