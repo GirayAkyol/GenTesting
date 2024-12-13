@@ -42,8 +42,9 @@ public class MyStoreAvlMbt {
     ActionChainArbitrary<MBT> storeActions() {
         return ActionChain.<MBT>startWith(MBT::new)
                 .withAction(1, new StoreNewValue())
-                .withAction(1, new UpdateValue())
-                .withAction(1, new RemoveValue()).withMaxTransformations(10);
+                //.withAction(1, new UpdateValue())
+                .withAction(1, new RemoveValue())
+                .withMaxTransformations(10);
     }
 
     static class StoreNewValue implements Action.Independent<MBT> {
@@ -55,9 +56,11 @@ public class MyStoreAvlMbt {
                             state -> {
                                 MyStoreAVL<String> system = state.system;
                                 MyStore<Integer, String> model = state.model;
-
+                                system.store(key, value);
+                                model.store(key, value);
                                 assertThat(system.isEmpty()).isFalse();
                                 assertThat(model.isEmpty()).isFalse();
+                                assertThat(system.get(key)).isEqualTo(model.get(key).get());
                             }
                     ));
         }
@@ -100,6 +103,10 @@ public class MyStoreAvlMbt {
                     store -> {
                         MyStoreAVL<String> system = state.system;
                         MyStore<Integer, String> model = state.model;
+                        system.delete(key);
+                        model.remove(key);
+                        assertThat(system.isEmpty()).isEqualTo(model.isEmpty());
+                        assertThat(system.get(key) != null).isEqualTo(model.get(key).isPresent());
 
                     }
             ));

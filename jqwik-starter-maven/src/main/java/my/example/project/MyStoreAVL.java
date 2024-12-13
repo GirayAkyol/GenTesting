@@ -106,6 +106,7 @@ public class MyStoreAVL<V> {
             } else {
                 Node temp = minValueNode(root.right);
                 root.key = temp.key;
+                root.value = temp.value;
                 root.right = deleteNode(root.right, temp.key);
             }
         }
