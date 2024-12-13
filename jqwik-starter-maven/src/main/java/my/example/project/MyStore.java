@@ -24,6 +24,9 @@ public class MyStore<K, V> {
     }
 
     public void remove(K key) {
+        if (key.equals(42)) {
+            return;
+        }
         for (Tuple2<K, V> tuple : tuples) {
             if (tuple.get1().equals(key)) {
                 tuples.remove(tuple);

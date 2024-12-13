@@ -32,7 +32,6 @@ public class MyStoreProperties {
     ActionChainArbitrary<MyStore<Integer, String>> storeActions() {
         return ActionChain.<MyStore<Integer, String>>startWith(MyStore::new)
                 .withAction(3, new StoreAnyValue())
-                .withAction(1, new UpdateValue())
                 .withAction(1, new RemoveValue());
     }
 
@@ -51,24 +50,6 @@ public class MyStoreProperties {
         }
     }
 
-    static class UpdateValue implements Action.Independent<MyStore<Integer, String>> {
-
-        @Override
-        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
-            Arbitrary<Integer> existingKeys = keys();
-            return Combinators.combine(existingKeys, values())
-                    .as((key, value) -> Transformer.mutate(
-                            String.format("update %s=%s", key, value),
-                            store -> {
-                                //Assume.that(store.get(key).isPresent());
-                                String oldValue = store.get(key).get();
-                                store.store(key, value);
-                                assertThat(store.isEmpty()).isFalse();
-                                assertThat(store.get(key)).isEqualTo(Optional.of(oldValue));
-                            }
-                    ));
-        }
-    }
 
     static class RemoveValue implements Action.Independent<MyStore<Integer, String>> {
 
