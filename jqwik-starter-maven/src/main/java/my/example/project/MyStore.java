@@ -24,9 +24,6 @@ public class MyStore<K, V> {
     }
 
     public void remove(K key) {
-        if (key.equals(42)) {
-            return;
-        }
         for (Tuple2<K, V> tuple : tuples) {
             if (tuple.get1().equals(key)) {
                 tuples.remove(tuple);
@@ -45,9 +42,10 @@ public class MyStore<K, V> {
 
     @Override
     public String toString() {
-        Set<String> contents = keys().stream()
-                .map(k -> String.format("%s=%s", k, get(k).orElse(null)))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-        return String.format("Store %s", contents);
+        return tuples.toString();
+//        Set<String> contents = keys().stream()
+//                .map(k -> String.format("%s=%s", k, get(k).orElse(null)))
+//                .collect(Collectors.toCollection(LinkedHashSet::new));
+//        return String.format("Store %s", contents);
     }
 }

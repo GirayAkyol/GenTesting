@@ -9,7 +9,7 @@ import org.assertj.core.api.Assertions;
 
 import static org.assertj.core.api.Assertions.*;
 
-@PropertyDefaults(tries = 100)
+@PropertyDefaults(tries = 1000)
 public class MyStoreProperties {
 
     /**
@@ -31,7 +31,7 @@ public class MyStoreProperties {
     @Provide
     ActionChainArbitrary<MyStore<Integer, String>> storeActions() {
         return ActionChain.<MyStore<Integer, String>>startWith(MyStore::new)
-                .withAction(3, new StoreAnyValue())
+                .withAction(1, new StoreAnyValue())
                 .withAction(1, new RemoveValue());
     }
 
@@ -51,16 +51,20 @@ public class MyStoreProperties {
     }
 
 
-    static class RemoveValue implements Action.Independent<MyStore<Integer, String>> {
-
+    static class RemoveValue implements Action.Dependent<MyStore<Integer, String>> {
 
         @Override
-        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer() {
-            Arbitrary<Integer> existingKeys = keys();
+        public boolean precondition(MyStore<Integer, String> state) {
+            return !state.isEmpty();
+        }
+
+        @Override
+        public Arbitrary<Transformer<MyStore<Integer, String>>> transformer(MyStore<Integer, String> state) {
+            Arbitrary<Integer> existingKeys = Arbitraries.of(state.keys());
             return existingKeys.map(key -> Transformer.mutate(
                     String.format("remove %s", key),
                     store -> {
-                        //Assume.that(store.get(key).isPresent());
+                        Assume.that(store.get(key).isPresent());
                         store.remove(key);
                         assertThat(store.get(key)).describedAs("value of key <%s>", key).isNotPresent();
                     }
