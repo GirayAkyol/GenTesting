@@ -33,7 +33,9 @@ public class MyStoreAvlMbt {
 
     @Property(shrinking = ShrinkingMode.FULL, afterFailure = AfterFailureMode.PREVIOUS_SEED)
     void storeWorksAsExpected(@ForAll("storeActions") ActionChain<MBT> storeChain) {
-        storeChain.run();
+        storeChain.withInvariant("samekeys", state -> {
+            assertThat(state.system.keys()).containsExactlyInAnyOrderElementsOf(state.model.keys());
+        }).run();
     }
 
     @Provide
