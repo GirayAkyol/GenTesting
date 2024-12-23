@@ -13,7 +13,8 @@ public class MyStoreAvlMbt {
 
     public static class MBT {
         public MyStoreAVL<String> system = new MyStoreAVL<>();
-        public MyStore<Integer, String> model = new MyStore<>();
+        //public MyStore<Integer, String> model = new MyStore<>();
+        public MyStoreHash model = new MyStoreHash();
 
         // override to string
         @Override
@@ -54,12 +55,12 @@ public class MyStoreAvlMbt {
                             String.format("store %s=%s", key, value),
                             state -> {
                                 MyStoreAVL<String> system = state.system;
-                                MyStore<Integer, String> model = state.model;
+                                MyStoreHash model = state.model;
                                 system.store(key, value);
                                 model.store(key, value);
                                 assertThat(system.isEmpty()).isFalse();
                                 assertThat(model.isEmpty()).isFalse();
-                                assertThat(system.get(key)).isEqualTo(model.get(key).get());
+                                assertThat(system.get(key)).isEqualTo(model.get(key));
                             }
                     ));
         }
@@ -78,11 +79,11 @@ public class MyStoreAvlMbt {
                     String.format("remove %s", key),
                     store -> {
                         MyStoreAVL<String> system = state.system;
-                        MyStore<Integer, String> model = state.model;
+                        MyStoreHash model = state.model;
                         system.delete(key);
                         model.remove(key);
                         assertThat(system.isEmpty()).isEqualTo(model.isEmpty());
-                        assertThat(system.get(key) != null).isEqualTo(model.get(key).isPresent());
+                        assertThat(system.get(key) != null).isEqualTo(model.get(key) != null);
 
                     }
             ));
