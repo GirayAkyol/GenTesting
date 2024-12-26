@@ -54,4 +54,17 @@ public class MyGcdHW {
         assert result == x;
 
     }
+
+        @Property
+    /**
+     * Write a property test for the above gcd implementation.
+     * The GCD implementation is correct so the test needs to pass.
+     * You are allowed to change the signature and name of the property test method.
+     * 15 points
+     */
+    public void yourtest3(@ForAll @IntRange(min = 0) int x) {
+        int result = gcd(x, x);
+        assert result == x;
+
+    }
 }
