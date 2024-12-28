@@ -4,6 +4,7 @@ import net.jqwik.api.Example;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.IntRange;
+import org.assertj.core.api.Assertions;
 
 public class MyGcdHW {
     // You are not allowed to make changes to the implementation.
@@ -30,15 +31,23 @@ public class MyGcdHW {
 
     @Property
     /**
-     * Write a property test for the above gcd implementation.
-     * The GCD implementation is correct so the test needs to pass.
-     * You are allowed to change the signature and name of the property test method.
-     * 15 points
+     * Example property test.
+     *
      */
-    public void yourtest1(@ForAll @IntRange(min = 0) int x, @ForAll @IntRange(min = 0) int y) {
+    public void symmetry(@ForAll @IntRange(min = 0) int x, @ForAll @IntRange(min = 0) int y) {
         int result1 = gcd(x, y);
         int result2 = gcd(y, x);
-        assert result1 == result2;
+        Assertions.assertThat(result1).isEqualTo(result2);
+
+    }
+
+    @Property
+    /**
+     * Example property test.
+     */
+    public void identity(@ForAll @IntRange(min = 0) int x) {
+        int result = gcd(x, x);
+        Assertions.assertThat(result).isEqualTo(x);
 
     }
 
@@ -46,25 +55,24 @@ public class MyGcdHW {
     /**
      * Write a property test for the above gcd implementation.
      * The GCD implementation is correct so the test needs to pass.
+     * It has to be different from the symmetry and identity tests.
      * You are allowed to change the signature and name of the property test method.
-     * 15 points
+     * 20 points
      */
-    public void yourtest2(@ForAll @IntRange(min = 0) int x) {
-        int result = gcd(x, x);
-        assert result == x;
+    public void yourtest1() {
+
 
     }
 
-        @Property
+    @Property
     /**
      * Write a property test for the above gcd implementation.
      * The GCD implementation is correct so the test needs to pass.
+     * It has to be different from the symmetry and identity tests.
      * You are allowed to change the signature and name of the property test method.
-     * 15 points
+     * 20 points
      */
-    public void yourtest3(@ForAll @IntRange(min = 0) int x) {
-        int result = gcd(x, x);
-        assert result == x;
+    public void yourtest2() {
 
     }
 }
